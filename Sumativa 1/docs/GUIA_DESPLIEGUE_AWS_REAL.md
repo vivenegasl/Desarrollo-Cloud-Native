@@ -110,34 +110,47 @@ ssh -i "C:\ruta\a\tu-clave.pem" ubuntu@<IP_PUBLICA_EC2>
 
 Una vez dentro de la terminal de Ubuntu en EC2:
 
-### 5.1 Ejecutar el script automatizado
-Puedes ejecutar directamente el script que preparamos:
-
+### 5.1 Si ejecutaste comandos previos con el placeholder y necesitas limpiarlo / corregirlo:
+Ejecuta estas 2 líneas para revertir cualquier montaje o entrada previa en `/etc/fstab`:
 ```bash
-# Descargar o crear el script en EC2 y ejecutar con tu ID de EFS:
-curl -fsSL https://raw.githubusercontent.com/<tu_usuario>/<tu_repo>/main/Sumativa%201/scripts/setup_ec2_efs.sh -o setup_ec2_efs.sh || true
+# 1. Desmontar cualquier proceso previo de forma limpia
+sudo umount -f -l /mnt/efs/tickets 2>/dev/null || true
 
-# O ejecutar los comandos manualmente:
+# 2. Limpiar entradas previas de EFS en /etc/fstab
+sudo sed -i '/efs/d' /etc/fstab
+```
+
+### 5.2 Montar tu Amazon EFS Real (ID: fs-031e5e5ca691d5661):
+Ejecuta directamente:
+```bash
+# 1. Instalar utilidades NFS y Docker si no están instaladas
 sudo apt-get update -y
 sudo apt-get install -y nfs-common docker.io curl
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker ubuntu
 
-# Crear punto de montaje EFS
+# 2. Crear punto de montaje EFS
 sudo mkdir -p /mnt/efs/tickets
 sudo chmod 777 /mnt/efs/tickets
 
-# Montar tu EFS real (ID: fs-031e5e5ca691d5661)
+# 3. Montar tu EFS real
 sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/ /mnt/efs/tickets
 
-# Verificar que esté montado
+# 4. Dejar el montaje persistente tras reinicios
+echo "fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/ /mnt/efs/tickets nfs4 defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+
+# 5. Verificar que esté montado correctamente
 df -h /mnt/efs/tickets
 ```
+*(Si `df -h /mnt/efs/tickets` muestra `fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/`, ¡el montaje fue 100% exitoso!)*
 
 ---
 
 ## 🚀 Paso 6: Configurar GitHub Secrets y Desplegar con CI/CD
+
+El repositorio ya está configurado en: **`https://github.com/vivenegasl/Desarrollo-Cloud-Native.git`**  
+La Sumativa 1 se encuentra encapsulada dentro de la carpeta `Sumativa 1/` para permitir que las futuras evaluaciones convivan en el mismo repositorio.
 
 Para que el pipeline de GitHub Actions despliegue automáticamente en tu instancia EC2 cada vez que hagas `git push`:
 
