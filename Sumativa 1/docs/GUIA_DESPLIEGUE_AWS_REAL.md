@@ -108,39 +108,46 @@ Abre una terminal de PowerShell en tu equipo y conéctate por SSH a tu instancia
 ssh -i "C:\ruta\a\tu-clave.pem" ubuntu@<IP_PUBLICA_EC2>
 ```
 
-Una vez dentro de la terminal de Ubuntu en EC2:
+Una vez dentro de la terminal de Ubuntu en EC2, tienes dos formas de configurarlo:
 
-### 5.1 Si ejecutaste comandos previos con el placeholder y necesitas limpiarlo / corregirlo:
-Ejecuta estas 2 líneas para revertir cualquier montaje o entrada previa en `/etc/fstab`:
+### Opción A (Recomendada - 1 solo comando desde tu GitHub oficial):
+Descarga y ejecuta directamente el script que ya está alojado en tu repositorio de GitHub. Este script **limpia automáticamente cualquier intento previo fallido**, instala Docker, utilidades NFS y monta tu EFS real (`fs-031e5e5ca691d5661`):
+
 ```bash
-# 1. Desmontar cualquier proceso previo de forma limpia
-sudo umount -f -l /mnt/efs/tickets 2>/dev/null || true
+curl -fsSL "https://raw.githubusercontent.com/vivenegasl/Desarrollo-Cloud-Native/main/Sumativa%201/scripts/setup_ec2_efs.sh" | bash
+```
 
-# 2. Limpiar entradas previas de EFS en /etc/fstab
+---
+
+### Opción B (Comandos manuales paso a paso si prefieres ver cada línea):
+
+#### 1. Revertir y limpiar el intento anterior:
+```bash
+# Desmontar cualquier proceso previo y limpiar fstab
+sudo umount -f -l /mnt/efs/tickets 2>/dev/null || true
 sudo sed -i '/efs/d' /etc/fstab
 ```
 
-### 5.2 Montar tu Amazon EFS Real (ID: fs-031e5e5ca691d5661):
-Ejecuta directamente:
+#### 2. Instalar utilidades y montar tu EFS real:
 ```bash
-# 1. Instalar utilidades NFS y Docker si no están instaladas
+# Instalar paquetes
 sudo apt-get update -y
 sudo apt-get install -y nfs-common docker.io curl
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker ubuntu
 
-# 2. Crear punto de montaje EFS
+# Crear carpeta de montaje
 sudo mkdir -p /mnt/efs/tickets
 sudo chmod 777 /mnt/efs/tickets
 
-# 3. Montar tu EFS real
+# Montar tu EFS real (ID: fs-031e5e5ca691d5661)
 sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/ /mnt/efs/tickets
 
-# 4. Dejar el montaje persistente tras reinicios
+# Dejar el montaje persistente tras reinicios
 echo "fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/ /mnt/efs/tickets nfs4 defaults,_netdev 0 0" | sudo tee -a /etc/fstab
 
-# 5. Verificar que esté montado correctamente
+# Verificar montaje
 df -h /mnt/efs/tickets
 ```
 *(Si `df -h /mnt/efs/tickets` muestra `fs-031e5e5ca691d5661.efs.us-east-1.amazonaws.com:/`, ¡el montaje fue 100% exitoso!)*

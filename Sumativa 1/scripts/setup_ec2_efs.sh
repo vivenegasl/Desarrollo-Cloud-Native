@@ -48,8 +48,10 @@ else
     echo ">> [2/5] Docker ya se encuentra instalado."
 fi
 
-# 3. Crear directorio de montaje local para EFS
-echo ">> [3/5] Creando punto de montaje para EFS en ${MOUNT_POINT}..."
+# 3. Limpiar cualquier montaje previo y preparar directorio de montaje local para EFS
+echo ">> [3/5] Limpiando montajes previos y preparando punto de montaje en ${MOUNT_POINT}..."
+sudo umount -f -l "${MOUNT_POINT}" 2>/dev/null || true
+sudo sed -i '/efs/d' /etc/fstab
 sudo mkdir -p "${MOUNT_POINT}"
 sudo chmod 777 "${MOUNT_POINT}"
 
