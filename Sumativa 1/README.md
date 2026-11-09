@@ -132,19 +132,6 @@ El archivo `.github/workflows/ci-cd.yml` automatiza la integración y entrega co
 
 ---
 
-## 🎥 Guía para la Grabación y Presentación en Teams
-
-Consulta el documento especializado:
-📄 **[`docs/GUIA_GRABACION_PRESENTACION.md`](docs/GUIA_GRABACION_PRESENTACION.md)**
-
-Contiene:
-- Estructura temporal minuto a minuto (8 a 10 minutos).
-- Guion con el diálogo exacto en español a pronunciar.
-- Instrucciones de qué mostrar en pantalla (Postman, PDF con código QR, Swagger, GitHub Actions, Docker Hub).
-- Checklist de verificación previo al envío al AVA.
-
----
-
 ## 📄 Licencia y Derechos de Autor
 
 Desarrollado para la asignatura **Desarrollo Cloud Native (CDY2204)** - Duoc UC.  
