@@ -1,0 +1,101 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: ticket-service
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+# Configuración Común / Dev (H2 en memoria por defecto para arranque instantáneo)
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:ticketdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  storage:
+    efs:
+      mount-path: ${EFS_MOUNT_PATH:./storage/efs/tickets}
+      clean-on-s3-upload: false # Mantiene copia temporal en EFS para alta disponibilidad y auditoría
+  aws:
+    region: ${AWS_REGION:us-east-1}
+    s3:
+      bucket-name: ${AWS_S3_BUCKET:ticketflow-storage-duoc-vjvl}
+      endpoint-url: ${AWS_ENDPOINT_URL:} # Si se deja vacío, conecta a AWS S3 real
+      access-key-id: ${AWS_ACCESS_KEY_ID:test}
+      secret-access-key: ${AWS_SECRET_ACCESS_KEY:test}
+      presigned-url-expiration-minutes: 15
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+# Perfil Producción / EC2 / Docker Compose con PostgreSQL
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+app:
+  storage:
+    efs:
+      mount-path: ${EFS_MOUNT_PATH:/mnt/efs/tickets}
+      clean-on-s3-upload: false
+  aws:
+    region: ${AWS_REGION:us-east-1}
+    s3:
+      bucket-name: ${AWS_S3_BUCKET:ticketflow-storage-duoc-vjvl}
+      endpoint-url: ${AWS_ENDPOINT_URL:}
+      access-key-id: ${AWS_ACCESS_KEY_ID:}
+      secret-access-key: ${AWS_SECRET_ACCESS_KEY:}
+      presigned-url-expiration-minutes: 15

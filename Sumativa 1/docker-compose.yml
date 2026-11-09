@@ -1,0 +1,75 @@
+version: '3.8'
+
+# ==============================================================================
+# Docker Compose: Entorno Cloud Native Completo (PostgreSQL + S3 Mock + EFS Mount)
+# Asignatura: Desarrollo Cloud Native (CDY2204) - Duoc UC
+# ==============================================================================
+
+services:
+  # 1. Base de Datos Relacional para Metadatos e Historial
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticketflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ticketdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ticketdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. LocalStack: Emulador de Amazon S3 para Pruebas Locales Idénticas a AWS
+  localstack:
+    image: localstack/localstack:latest
+    container_name: ticketflow-localstack-s3
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+      - PERSISTENCE=0
+    volumes:
+      - localstack_data:/var/lib/localstack
+      # Script de inicialización para auto-crear el bucket S3 requerido
+      - ./scripts/init_localstack_s3.sh:/etc/localstack/init/ready.d/init_s3.sh:ro
+
+  # 3. Microservicio TicketFlow (Spring Boot 3 + Java 21)
+  ticket-service:
+    build:
+      context: ./ticket-service
+      dockerfile: Dockerfile
+    container_name: ticketflow-service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://postgres:5432/ticketdb
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgrespassword
+      - AWS_REGION=us-east-1
+      - AWS_S3_BUCKET=ticketflow-storage-duoc-vjvl
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - EFS_MOUNT_PATH=/mnt/efs/tickets
+    volumes:
+      # Simulación exacta del volumen NFS Amazon EFS montado en EC2 (Criterio 1)
+      - ./efs_storage_local:/mnt/efs/tickets
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+
+volumes:
+  pgdata:
+  localstack_data:

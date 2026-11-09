@@ -1,0 +1,34 @@
+# Duoc UC ONLINE
+
+**Semana 3**  
+**Desarrollo Cloud Native (CDY2204)**  
+**Pauta de evaluación sumativa**  
+*Construyendo y desplegando una solución Cloud Native*
+
+A continuación, se presentan los descriptores de los niveles de logro con los que serás retroalimentado/a y/o evaluado/a:
+
+| Sigla | Nivel de Logro | Descripción |
+| :---: | :--- | :--- |
+| **CL** | Completamente Logrado (100%) | Logro completo del manejo del indicador, se considera como el punto óptimo, de acuerdo al área evaluada, dentro del rango de competente. |
+| **L** | Logrado (80%) | Logro del indicador, se observan pequeñas dificultades o errores para alcanzar el logro total y sobresaliendo de lo mínimo aceptable. |
+| **ML** | Medianamente Logrado (60%) | Logro mínimo aceptable en el manejo del indicador que permite ser considerado competente. |
+| **LI** | Logro Insuficiente (30%) | Logro insuficiente en el manejo del indicador, se observan varias dificultades o errores que no le permiten alcanzar el logro mínimo para ser considerado competente. |
+| **NL** | No Logrado (0%) | Se observan un escaso, nulo o incorrecto logro en el manejo del indicador. |
+
+---
+
+## Rúbrica de Evaluación
+
+| N° | Criterios | Completamente Logrado (100%) | Logrado (80%) | Medianamente Logrado (60%) | Logro Insuficiente (30%) | No Logrado (0%) |
+| :---: | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1** | **Configura el almacenamiento temporal en EFS.**<br>*(15 puntos)* | Configura EFS correctamente, asegurando el almacenamiento funcional y organizado según los requisitos establecidos.<br>*(15 puntos)* | Configura EFS funcionalmente, pero con ligeros errores en la organización o detalles menores.<br>*(12 puntos)* | Configura EFS con errores significativos que afectan la organización o funcionalidad.<br>*(9 puntos)* | Configura EFS parcialmente, con múltiples errores o faltantes importantes.<br>*(4 puntos)* | No configura EFS o no cumple con los requisitos.<br>*(0 puntos)* |
+| **2** | **Sube los archivos generados a AWS S3.**<br>*(10 puntos)* | Sube los archivos automáticamente a AWS S3, organizados correctamente en carpetas según los parámetros indicados (fecha, usuario o entidad).<br>*(10 puntos)* | Sube los archivos a AWS S3 con organización funcional, pero con detalles menores en la estructura de carpetas.<br>*(7 puntos)* | Sube los archivos a AWS S3, pero sin la organización adecuada según los parámetros requeridos.<br>*(5 puntos)* | Sube los archivos a AWS S3 parcialmente o con errores importantes en la funcionalidad.<br>*(3 puntos)* | No se implementa la funcionalidad de subir archivos a S3.<br>*(0 puntos)* |
+| **3** | **Modifica y actualiza los archivos en AWS S3.**<br>*(15 puntos)* | Modifica y actualiza archivos en S3 correctamente, respetando los formatos y requisitos establecidos.<br>*(15 puntos)* | Modifica y actualiza archivos en S3 con errores menores que no afectan su operatividad.<br>*(12 puntos)* | Modifica y actualiza archivos en S3 con errores significativos o limitaciones en la funcionalidad.<br>*(9 puntos)* | Modifica y actualiza archivos parcialmente o con múltiples errores graves.<br>*(4 puntos)* | No modifica ni actualiza archivos en S3.<br>*(0 puntos)* |
+| **4** | **Descarga los archivos desde AWS S3.**<br>*(10 puntos)* | Descarga los archivos desde S3 correctamente, asegurando su integridad y funcionalidad completa.<br>*(10 puntos)* | Descarga los archivos desde S3 funcionalmente, pero con ligeros errores o detalles menores.<br>*(7 puntos)* | Descarga los archivos desde S3 con errores significativos que afectan su uso.<br>*(5 puntos)* | Descarga los archivos parcialmente o con errores graves.<br>*(3 puntos)* | No descarga los archivos desde AWS S3.<br>*(0 puntos)* |
+| **5** | **Consulta el historial de archivos generados.**<br>*(10 puntos)* | Consulta el historial de archivos generados de manera precisa y eficiente, cumpliendo con los filtros requeridos.<br>*(10 puntos)* | Consulta el historial funcionalmente, pero con detalles menores en los filtros o resultados.<br>*(7 puntos)* | Consulta el historial parcialmente, con errores significativos o limitaciones en los filtros.<br>*(5 puntos)* | Consulta el historial con errores graves que limitan su uso.<br>*(3 puntos)* | No consulta el historial de archivos generados.<br>*(0 puntos)* |
+| **6** | **Despliega la aplicación mediante un pipeline automatizado.**<br>*(20 puntos)* | Despliega la aplicación utilizando un pipeline funcional, que incluye generación de imagen Docker y despliegue en EC2 con GitHub Actions.<br>*(20 puntos)* | Despliega la aplicación funcionalmente, pero con ligeros errores en el pipeline o en la configuración de despliegue.<br>*(15 puntos)* | Despliega la aplicación parcialmente, con errores significativos en el pipeline o en la ejecución.<br>*(10 puntos)* | Despliega la aplicación con errores graves que afectan su funcionamiento.<br>*(5 puntos)* | No despliega la aplicación mediante un pipeline automatizado.<br>*(0 puntos)* |
+| **7** | **Presenta la solución en funcionamiento mediante un video explicativo que muestre de forma completa todas las funciones implementadas y cómo estas cumplen con los requerimientos solicitados.**<br>*(20 puntos)* | Presenta un video explicativo completo, claro y bien estructurado, que demuestra todas las funciones implementadas del sistema en pleno funcionamiento. Explica de forma coherente cómo se cumplen los requerimientos técnicos y funcionales definidos.<br>*(20 puntos)* | Presenta un video funcional y comprensible, donde se muestran la mayoría de las funciones implementadas. Se evidencian pequeñas omisiones o dificultades menores en la explicación o en la demostración del cumplimiento de algunos requerimientos.<br>*(15 puntos)* | El video presenta lo solicitado en funcionamiento de manera parcial, mostrando sólo las funciones principales o sin explicar con claridad la relación con los requerimientos. Existen errores menores o falta de detalle en la presentación.<br>*(10 puntos)* | El video muestra de forma incompleta o confusa el funcionamiento de lo solicitado, con varias omisiones de funciones relevantes o con explicaciones poco claras sobre su cumplimiento de los requerimientos.<br>*(5 puntos)* | No presenta video o el material entregado no permite evidenciar el funcionamiento del sistema ni su relación con los requerimientos solicitados.<br>*(0 puntos)* |
+
+---
+
+*Reservados todos los derechos Fundación Instituto Profesional Duoc UC. No se permite copiar, reproducir, reeditar, descargar, publicar, emitir, difundir, de forma total o parcial la presente obra, ni su incorporación a un sistema informático, ni su transmisión en cualquier forma o por cualquier medio (electrónico, mecánico, fotocopia, grabación u otros) sin autorización previa y por escrito de Fundación Instituto Profesional Duoc UC. La infracción de dichos derechos puede constituir un delito contra la propiedad intelectual.*

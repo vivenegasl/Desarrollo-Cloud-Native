@@ -1,0 +1,12 @@
+target/
+*.class
+storage/
+efs_storage_local/
+local_storage/
+*.log
+.DS_Store
+Thumbs.db
+
+# Excluir guion privado de grabacion
+*GUIA_GRABACION_PRESENTACION.md
+Sumativa 1/docs/GUIA_GRABACION_PRESENTACION.md
