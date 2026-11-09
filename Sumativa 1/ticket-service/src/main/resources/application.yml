@@ -69,19 +69,17 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: method
 
-# Perfil Producción / EC2 / Docker Compose con PostgreSQL
+# Perfil Producción / EC2 / Docker Compose
 ---
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketdb}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:h2:file:/mnt/efs/tickets/ticketdb;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: false
