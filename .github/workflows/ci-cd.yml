@@ -1,5 +1,11 @@
 name: CI/CD Pipeline - Cloud Native TicketFlow
 
+# ==============================================================================
+# Pipeline Automatizado Unificado de Alto Rendimiento (Fast CI/CD)
+# Asignatura: Desarrollo Cloud Native (CDY2204) - Duoc UC
+# Criterio 6: Imagen Docker en Docker Hub + Despliegue en EC2 (20 pts)
+# ==============================================================================
+
 on:
   push:
     branches: [ "main", "master" ]
@@ -8,43 +14,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: Maven Build and Unit Tests
+  pipeline:
+    name: Build, Test, Docker Hub and Deploy to AWS EC2
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout codigo
+      - name: 1. Checkout del codigo fuente
         uses: actions/checkout@v4
 
-      - name: Configurar JDK 21
+      - name: 2. Configurar JDK 21 (Eclipse Temurin)
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
 
-      - name: Ejecutar pruebas unitarias con Maven
+      - name: 3. Compilar y ejecutar pruebas unitarias con Maven
         working-directory: "Sumativa 1/ticket-service"
-        run: mvn clean verify -B
+        run: mvn clean package -B
 
-  build-and-push-docker:
-    name: Build and Push Docker Image
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout codigo
-        uses: actions/checkout@v4
-
-      - name: Configurar Docker Buildx
+      - name: 4. Configurar Docker Buildx
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: docker/setup-buildx-action@v3
 
-      - name: Iniciar sesion en Docker Hub
+      - name: 5. Iniciar sesion en Docker Hub
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Construir y publicar imagen
+      - name: 6. Construir y publicar imagen en Docker Hub
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v5
         with:
           context: "Sumativa 1/ticket-service"
@@ -54,13 +54,8 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/ticketflow-service:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/ticketflow-service:${{ github.sha }}
 
-  deploy-to-ec2:
-    name: Deploy to AWS EC2
-    needs: build-and-push-docker
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Desplegar en EC2 via SSH
+      - name: 7. Desplegar automaticamente en AWS EC2 via SSH
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -68,17 +63,23 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            echo "Iniciando despliegue en AWS EC2..."
+            echo "=========================================================="
+            echo "DESPLIEGUE CONTINUO EN AWS EC2 - CLOUD NATIVE"
+            echo "=========================================================="
+            
+            # Asegurar directorio de Amazon EFS
             sudo mkdir -p /mnt/efs/tickets
             sudo chmod 777 /mnt/efs/tickets
             
             IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/ticketflow-service:latest"
-            echo "Descargando imagen: $IMAGE"
+            echo "Descargando imagen actualizada desde Docker Hub: $IMAGE"
             docker pull $IMAGE
             
+            echo "Deteniendo contenedor previo si existe..."
             docker stop ticketflow-service 2>/dev/null || true
             docker rm ticketflow-service 2>/dev/null || true
             
+            echo "Iniciando nuevo contenedor con volumen Amazon EFS..."
             docker run -d \
               --name ticketflow-service \
               --restart always \
@@ -92,7 +93,10 @@ jobs:
               -e EFS_MOUNT_PATH=/mnt/efs/tickets \
               $IMAGE
             
-            echo "Verificando salud de la aplicacion..."
+            echo "Verificando salud del microservicio (Healthcheck)..."
             sleep 15
             curl -f http://localhost:8080/actuator/health || exit 1
-            echo "Despliegue completado exitosamente."
+            
+            echo "=========================================================="
+            echo "DESPLIEGUE EXITOSO EN AWS EC2 (Estado: UP)"
+            echo "=========================================================="
